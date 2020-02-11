@@ -1,4 +1,4 @@
-module datastoreutils
+module github.com/arran4/datastoreutils
 
 go 1.12
 

@@ -21,6 +21,9 @@ func IncompleteKeyWithNamespace(kind, namespace string, parent *datastore.Key) *
 // The supplied parent must either be a complete key or nil.
 // The namespace of the new key can be empty.
 func NameKeyWithNamespace(kind, namespace, name string, parent *datastore.Key) *datastore.Key {
+	if kind == "" {
+		panic("dsutils: kind cannot be empty")
+	}
 	key := &datastore.Key{
 		Kind:   kind,
 		Name:   name,

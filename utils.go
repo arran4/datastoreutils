@@ -8,6 +8,9 @@ import (
 // The supplied kind cannot be empty.
 // The namespace of the new key can be empty.
 func IncompleteKeyWithNamespace(kind, namespace string, parent *datastore.Key) *datastore.Key {
+	if kind == "" {
+		return nil
+	}
 	key := &datastore.Key{
 		Kind:   kind,
 		Parent: parent,

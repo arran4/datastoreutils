@@ -7,8 +7,24 @@ Happy to add more.
 ### Usage
 
 ```go
-key := dsutils.IncompleteKeyWithNamespace(model.OptionKind, "namespace", nil)
-key := dsutils.NameKeyWithNamespace(model.OptionKind, "namespace", "Name", nil)
-key := dsutils.IDKeyWithNamespace(model.OptionKind, "namespace", int64(Id), nil)
+// Using Must versions (panics on error)
+key := dsutils.MustIncompleteKeyWithNamespace(model.OptionKind, "namespace", nil)
+key := dsutils.MustNameKeyWithNamespace(model.OptionKind, "namespace", "Name", nil)
+key := dsutils.MustIDKeyWithNamespace(model.OptionKind, "namespace", int64(Id), nil)
 
+// Using error return versions
+key, err := dsutils.IncompleteKeyWithNamespace(model.OptionKind, "namespace", nil)
+if err != nil {
+    // handle error
+}
+
+key, err = dsutils.NameKeyWithNamespace(model.OptionKind, "namespace", "Name", nil)
+if err != nil {
+    // handle error
+}
+
+key, err = dsutils.IDKeyWithNamespace(model.OptionKind, "namespace", int64(Id), nil)
+if err != nil {
+    // handle error
+}
 ```

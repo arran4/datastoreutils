@@ -1,8 +1,8 @@
 package dsutils
 
 import (
-	"testing"
 	"cloud.google.com/go/datastore"
+	"testing"
 )
 
 var result *datastore.Key
@@ -27,37 +27,37 @@ func TestMustNameKeyWithNamespace_EmptyKind(t *testing.T) {
 }
 
 func TestNameKeyWithNamespace_EmptyKind(t *testing.T) {
-    key, err := NameKeyWithNamespace("", "ns", "name", nil)
-    if err == nil {
-        t.Error("Expected error, got nil")
-    }
-    if key != nil {
-        t.Errorf("Expected nil key, got %v", key)
-    }
-    expected := "dsutils: kind cannot be empty"
-    if err.Error() != expected {
-        t.Errorf("Expected error message %q, got %q", expected, err.Error())
-    }
+	key, err := NameKeyWithNamespace("", "ns", "name", nil)
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+	if key != nil {
+		t.Errorf("Expected nil key, got %v", key)
+	}
+	expected := "dsutils: kind cannot be empty"
+	if err.Error() != expected {
+		t.Errorf("Expected error message %q, got %q", expected, err.Error())
+	}
 }
 
 func TestIncompleteKeyWithNamespace_EmptyKind(t *testing.T) {
-    key, err := IncompleteKeyWithNamespace("", "ns", nil)
-    if err == nil {
-        t.Error("Expected error, got nil")
-    }
-    if key != nil {
-        t.Errorf("Expected nil key, got %v", key)
-    }
+	key, err := IncompleteKeyWithNamespace("", "ns", nil)
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if key != nil {
+		t.Errorf("Expected nil key, got %v", key)
+	}
 }
 
 func TestIDKeyWithNamespace_EmptyKind(t *testing.T) {
-    key, err := IDKeyWithNamespace("", "ns", 123, nil)
-    if err == nil {
-        t.Error("Expected error, got nil")
-    }
-    if key != nil {
-        t.Errorf("Expected nil key, got %v", key)
-    }
+	key, err := IDKeyWithNamespace("", "ns", 123, nil)
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+	if key != nil {
+		t.Errorf("Expected nil key, got %v", key)
+	}
 }
 
 func TestNameKeyWithNamespace_IncompleteParent(t *testing.T) {

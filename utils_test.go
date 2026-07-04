@@ -29,7 +29,7 @@ func TestMustNameKeyWithNamespace_EmptyKind(t *testing.T) {
 func TestNameKeyWithNamespace_EmptyKind(t *testing.T) {
 	key, err := NameKeyWithNamespace("", "ns", "name", nil)
 	if err == nil {
-		t.Error("Expected error, got nil")
+		t.Fatal("Expected error, got nil")
 	}
 	if key != nil {
 		t.Errorf("Expected nil key, got %v", key)
@@ -53,7 +53,7 @@ func TestIncompleteKeyWithNamespace_EmptyKind(t *testing.T) {
 func TestIDKeyWithNamespace_EmptyKind(t *testing.T) {
 	key, err := IDKeyWithNamespace("", "ns", 123, nil)
 	if err == nil {
-		t.Error("Expected error, got nil")
+		t.Fatal("Expected error, got nil")
 	}
 	if key != nil {
 		t.Errorf("Expected nil key, got %v", key)

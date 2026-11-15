@@ -1,0 +1,44 @@
+name: Refresh all Go dependencies (temporary)
+on:
+  push:
+    branches:
+      - chore/refresh-all-dependencies-20261115
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: chore/refresh-all-dependencies-20261115
+          persist-credentials: true
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: true
+      - name: Upgrade dependencies and regenerate checksums
+        run: |
+          set -euo pipefail
+          go get -u ./...
+          go mod tidy
+          go mod verify
+          go test ./...
+          go vet ./...
+          echo "Updated module versions:"
+          go list -m all
+      - name: Commit resolved module graph
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add go.mod go.sum
+          if git diff --cached --quiet; then
+            echo "No dependency changes"
+            exit 0
+          fi
+          git commit -m "chore(deps): update all Go modules and checksums"
+          git push origin HEAD:refs/heads/chore/refresh-all-dependencies-20261115

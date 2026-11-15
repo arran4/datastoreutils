@@ -1,0 +1,74 @@
+# Deliberate, reviewable release requests. Change release-request.txt in a PR;
+# after merging to master, validate and publish the requested version once.
+name: Publish requested release
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/release-request.txt
+
+permissions:
+  contents: write
+  discussions: write
+
+concurrency:
+  group: requested-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Validate requested release
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(cat .github/release-request.txt)"
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "Invalid stable release version: $tag" >&2
+            exit 1
+          }
+          git fetch --tags --force
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "Refusing to republish existing tag: $tag" >&2
+            exit 1
+          fi
+          latest="$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || true)"
+          if [[ -n "$latest" && "$(printf '%s\n' "$latest" "$tag" | sort -V | tail -n1)" != "$tag" ]]; then
+            echo "Requested release $tag is not newer than $latest" >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Validate release commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          go mod verify
+          go test -race ./...
+          go vet ./...
+      - name: Publish verified tag and GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$TAG"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --generate-notes --discussion-category Announcements ||
+              gh release create "$TAG" --verify-tag --generate-notes
+          fi
+          gh release view "$TAG" --json tagName,isDraft,isPrerelease,url

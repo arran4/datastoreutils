@@ -29,6 +29,17 @@ if err != nil {
 }
 ```
 
+### Releases
+
+This repository is a Go library; releases are versioned Git tags and GitHub
+releases, without binary artifacts. To request a new stable release, change
+`.github/release-request.txt` to the next version in a pull request. Merging
+that change into `master` runs Go module verification, race-enabled tests,
+and `go vet` before publishing the tag and generated release notes.
+
+The existing CI/CD workflow also supports manually dispatched patch, minor,
+and major releases.
+
 ### License
 
 This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
